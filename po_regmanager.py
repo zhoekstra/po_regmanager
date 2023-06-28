@@ -20,7 +20,6 @@ async def on_ready():
 async def register_user(guild: discord.Guild, registration_string: str):
     args = [s.strip() for s in registration_string.split(',')]
     name = ''.join(args[0].strip())
-    ticket = ''.join(args[1].strip())
     discord_name = [s.strip() for s in args[2].split('#')]
     if len(discord_name) == 2:
         discord_username = discord_name[0]
@@ -34,7 +33,8 @@ async def register_user(guild: discord.Guild, registration_string: str):
     pronoun = args[3]
     badgenumber = args[8].strip()
     user: discord.Member = discord.utils.get(guild.members, name=discord_username, discriminator=discord_discriminator)
-    role = discord.utils.find(lambda m: ticket in m.name, guild.roles)
+    role_id = int(args[4])
+    role = discord.utils.find(lambda m: m.id == role_id, guild.roles)
     attendee_role = discord.utils.find(lambda m: "Attendee" in m.name, guild.roles)
     organizer_role = discord.utils.find(lambda m: "Organizer" in m.name, guild.roles)
     alumni_role = discord.utils.find(lambda m: "Alumni" in m.name, guild.roles)
@@ -58,7 +58,8 @@ async def register_user(guild: discord.Guild, registration_string: str):
             await user.add_roles(attendee_role, featured_guest_role, role, reason="RegistrationBot")
         else:
             await user.add_roles(attendee_role, role, reason="RegistrationBot")
-        user_nickname = "{0}{1} ({2}) #{3}".format(role_emoji[role.name], name, pronoun, badgenumber)
+        emoji = role_emoji.get(role.name, '❔')
+        user_nickname = "{0}{1} ({2}) #{3}".format(emoji, name, pronoun, badgenumber)
         await user.edit(nick=user_nickname)
         if alumni_role not in user.roles and moderator_role not in user.roles:
             await user.add_roles(first_po_role, reason="RegistrationBot")
