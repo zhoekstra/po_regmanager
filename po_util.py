@@ -7,7 +7,7 @@ role_emoji = {
     "🎲Designer": '🎲',
     "🎬Press": '🎬',
     "⏳Publisher": '⏳',
-    "🌎Moderator": '🌎',
+    "Moderator": '🌎',
     "✨Organizer": '✨',
     "🧡1st Protospiel Online": '🧡',
     "Team Player": '♥',

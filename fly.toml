@@ -1,15 +1,15 @@
-# fly.toml app configuration file generated for po-regmanager on 2023-06-27T15:29:58+02:00
+# fly.toml app configuration file generated for protospiel-registration-manager on 2023-06-27T17:44:26+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "po-regmanager"
-primary_region = "atl"
+app = "protospiel-registration-manager"
+primary_region = "den"
 
 [http_service]
   internal_port = 8080
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ["app"]

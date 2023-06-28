@@ -25,6 +25,9 @@ async def register_user(guild: discord.Guild, registration_string: str):
     if len(discord_name) == 2:
         discord_username = discord_name[0]
         discord_discriminator = discord_name[1]
+    elif len(discord_name) == 1:
+        discord_username = discord_name[0]
+        discord_discriminator = '0'
     else:
         print("discord name {} is invalid".format(discord_name))
         return None
