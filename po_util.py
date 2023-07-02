@@ -3,7 +3,7 @@ import discord
 role_emoji = {
     "Attendee": '🎟️',
     "🥈Alumni": '🥈',
-    "💡Playtester": '💡',
+    "💡Playtester": '💡', # some comment
     "🎲Designer": '🎲',
     "🎬Press": '🎬',
     "⏳Publisher": '⏳',
