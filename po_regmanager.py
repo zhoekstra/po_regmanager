@@ -53,11 +53,7 @@ async def register_user(guild: discord.Guild, registration_string: str):
         print("INFO: User {} is an organizer - ignoring".format(user.nick))
         return user
     else:
-        if role.id in [po_roles.PUBLISHER_ROLE_ID, po_roles.PRESS_ROLE_ID]:
-            featured_guest_role = discord.utils.get(guild.roles, id=po_roles.FEATURED_GUEST_ROLE_ID)
-            await user.add_roles(attendee_role, featured_guest_role, role, reason="RegistrationBot")
-        else:
-            await user.add_roles(attendee_role, role, reason="RegistrationBot")
+        await user.add_roles(attendee_role, role, reason="RegistrationBot")
         emoji = role_emoji.get(role.id, '❔')
         user_nickname = "{0}{1} ({2}) #{3}".format(emoji, name, pronoun, badgenumber)
         await user.edit(nick=user_nickname)

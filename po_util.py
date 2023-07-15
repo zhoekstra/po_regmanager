@@ -91,7 +91,6 @@ class role_list:
     TASK_6_ROLE_ID = roles[38][0]
     CONGRATULATIONS_ROLE_ID = roles[39][0]
     TREEHOUSE_ROLE_ID = roles[40][0]
-    FEATURED_GUEST_ROLE_ID = roles[43][0]
 
 
 po_roles = role_list()
