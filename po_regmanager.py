@@ -3,7 +3,7 @@
 
 import discord
 import os
-from po_util import role_emoji
+from po_util import role_emoji, po_roles
 from datetime import datetime
 
 client = discord.Client(
@@ -33,20 +33,18 @@ async def register_user(guild: discord.Guild, registration_string: str):
     pronoun = args[3]
     badgenumber = args[8].strip()
     user: discord.Member = discord.utils.get(guild.members, name=discord_username, discriminator=discord_discriminator)
-    badge_role_id = int(args[4])
-    additional_role_ids = [int(role_id) for role_id in args[12:33] if role_id]
-    badge_role = discord.utils.find(lambda m: m.id == badge_role_id, guild.roles)
-    additional_roles_to_add = [discord.utils.find(lambda m: m.id == role_id, guild.roles) for role_id in additional_role_ids]
-    attendee_role = discord.utils.find(lambda m: "Attendee" in m.name, guild.roles)
-    organizer_role = discord.utils.find(lambda m: "Organizer" in m.name, guild.roles)
-    alumni_role = discord.utils.find(lambda m: "Alumni" in m.name, guild.roles)
-    moderator_role = discord.utils.find(lambda m: "Moderator" in m.name, guild.roles)
-    first_po_role = discord.utils.find(lambda m: "1st Protospiel Online" in m.name, guild.roles)
+    role_id = int(args[4])
+    role = discord.utils.find(lambda m: m.id == role_id, guild.roles)
+    attendee_role = discord.utils.find(lambda m: m.id == po_roles.ATTENDEE_ROLE_ID, guild.roles)
+    organizer_role = discord.utils.find(lambda m: m.id == po_roles.ORGANIZER_ROLE_ID, guild.roles)
+    alumni_role = discord.utils.find(lambda m: m.id == po_roles.ALUMNI_ROLE_ID, guild.roles)
+    moderator_role = discord.utils.find(lambda m: m.id == po_roles.MODERATOR_ROLE_ID, guild.roles)
+    first_po_role = discord.utils.find(lambda m: m.id == po_roles.FIRST_PO_ROLE_ID, guild.roles)
     if user is None:
         print("{}".format(registration_string))
         print("ERROR: user cannot be found".format())
         return None
-    if badge_role is None:
+    if role is None:
         print("{}".format(registration_string))
         print("ERROR: role cannot be found".format())
         return None
@@ -55,18 +53,17 @@ async def register_user(guild: discord.Guild, registration_string: str):
         print("INFO: User {} is an organizer - ignoring".format(user.nick))
         return user
     else:
-        if badge_role.name in ["⏳Publisher", "🎬Press"]:
-            featured_guest_role = discord.utils.get(guild.roles, name="Featured Guest")
-            await user.add_roles(attendee_role, featured_guest_role, badge_role, reason="RegistrationBot")
+        if role.id in [po_roles.PUBLISHER_ROLE_ID, po_roles.PRESS_ROLE_ID]:
+            featured_guest_role = discord.utils.get(guild.roles, id=po_roles.FEATURED_GUEST_ROLE_ID)
+            await user.add_roles(attendee_role, featured_guest_role, role, reason="RegistrationBot")
         else:
-            roles_to_add = [attendee_role, badge_role] + additional_roles_to_add
-            await user.add_roles(*roles_to_add, reason="RegistrationBot")
-        emoji = role_emoji.get(badge_role.name, '❔')
+            await user.add_roles(attendee_role, role, reason="RegistrationBot")
+        emoji = role_emoji.get(role.id, '❔')
         user_nickname = "{0}{1} ({2}) #{3}".format(emoji, name, pronoun, badgenumber)
         await user.edit(nick=user_nickname)
         if alumni_role not in user.roles and moderator_role not in user.roles:
             await user.add_roles(first_po_role, reason="RegistrationBot")
-        print("INFO: User {} successfully registered as a {}".format(user.nick, badge_role.name))
+        print("INFO: User {} successfully registered as a {}".format(user.nick, role.name))
         # Also post some info to member-ids
         memberidpoststr = "{},{},{}".format(discord_username, discord_discriminator, user.id)
         memberidschannel: discord.TextChannel = discord.utils.get(guild.text_channels, name="member-ids")
@@ -89,8 +86,8 @@ async def handle_registration(message: discord.Message):
         registered_user = await register_user(message.guild, string_to_handle)
         if registered_user:
             for role in registered_user.roles:
-                if role.name in role_emoji:
-                    await message.add_reaction(role_emoji[role.name])
+                if role.id in role_emoji:
+                    await message.add_reaction(role_emoji[role.id])
             await message.add_reaction('✔️')
         else:
             await message.add_reaction('❓')
@@ -117,5 +114,3 @@ async def on_message(message: discord.Message):
         raise e
 
 client.run(os.environ.get('PROTOSPIEL_ONLINE_BOT_DISCORD_TOKEN'))
-
-# !regbot register ZacharyHoekstra,Moderator,hrusk,He,1102733286717001788,,UTC+1 ECT,Computer Thought,56,Clubs,January 2023,moderatorbadgeunlock2000tm
