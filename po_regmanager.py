@@ -84,7 +84,7 @@ async def handle_registration(message: discord.Message):
             for role in registered_user.roles:
                 if role.id in role_emoji:
                     await message.add_reaction(role_emoji[role.id])
-            await message.add_reaction('✔️')
+            await message.add_reaction('✅')
         else:
             await message.add_reaction('❓')
 
