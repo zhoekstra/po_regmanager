@@ -33,9 +33,20 @@ async def register_user(guild: discord.Guild, registration_string: str):
     pronoun = args[3]
     badgenumber = args[8].strip()
     user: discord.Member = discord.utils.get(guild.members, name=discord_username, discriminator=discord_discriminator)
-    role_id = int(args[4])
-    role = discord.utils.find(lambda m: m.id == role_id, guild.roles)
+    community_role = discord.utils.find(lambda m: m.id==po_roles.COMMUNITY_ROLE_ID, guild.roles)
     attendee_role = discord.utils.find(lambda m: m.id == po_roles.ATTENDEE_ROLE_ID, guild.roles)
+    registration_reason = args[1].strip()
+    if registration_reason in ('Designer', 'Playtester'):
+        role_id = int(args[4])
+        event_role = discord.utils.find(lambda m: m.id == role_id, guild.roles)
+        event_roles = [event_role, attendee_role]
+        emoji = role_emoji.get(event_role.id, '❔')
+        main_role = event_role
+    else:
+        event_roles = []
+        emoji = ''
+        main_role = community_role
+    all_roles = [community_role, *event_roles]
     organizer_role = discord.utils.find(lambda m: m.id == po_roles.ORGANIZER_ROLE_ID, guild.roles)
     alumni_role = discord.utils.find(lambda m: m.id == po_roles.ALUMNI_ROLE_ID, guild.roles)
     moderator_role = discord.utils.find(lambda m: m.id == po_roles.MODERATOR_ROLE_ID, guild.roles)
@@ -47,23 +58,22 @@ async def register_user(guild: discord.Guild, registration_string: str):
         print("{}".format(registration_string))
         print("ERROR: user cannot be found".format())
         return None
-    if role is None:
-        print("{}".format(registration_string))
-        print("ERROR: role cannot be found".format())
-        return None
+    # if role is None:
+    #     print("{}".format(registration_string))
+    #     print("ERROR: role cannot be found".format())
+    #     return None
     elif organizer_role in user.roles:
         print("{}".format(registration_string))
         print("INFO: User {} is an organizer - ignoring".format(user.nick))
         return user
     else:
-        await user.add_roles(attendee_role, role, reason="RegistrationBot")
-        emoji = role_emoji.get(role.id, '❔')
+        await user.add_roles(*all_roles, reason="RegistrationBot")
+        
         user_nickname = "{0}{1} ({2}) #{3}".format(emoji, name, pronoun, badgenumber)
         await user.edit(nick=user_nickname)
         if alumni_role not in user.roles and moderator_role not in user.roles:
             await user.add_roles(first_po_role, reason="RegistrationBot")
-        print("INFO: User {} successfully registered as a {}".format(user.nick, role.name))
-        
+        print("INFO: User {} successfully registered as a {}".format(user.nick, main_role.name))
         if len(info_roles) > 0:
             await user.add_roles(*info_roles, reason="RegistrationBot")
         # Also post some info to member-ids
