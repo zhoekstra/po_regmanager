@@ -36,6 +36,7 @@ async def register_user(guild: discord.Guild, registration_string: str):
     community_role = discord.utils.find(lambda m: m.id==po_roles.COMMUNITY_ROLE_ID, guild.roles)
     attendee_role = discord.utils.find(lambda m: m.id == po_roles.ATTENDEE_ROLE_ID, guild.roles)
     registration_reason = args[1].strip()
+    alumni_role = discord.utils.find(lambda m: m.id == po_roles.ALUMNI_ROLE_ID, guild.roles)
     if registration_reason in ('Designer', 'Playtester'):
         role_id = int(args[4])
         event_role = discord.utils.find(lambda m: m.id == role_id, guild.roles)
@@ -44,11 +45,13 @@ async def register_user(guild: discord.Guild, registration_string: str):
         main_role = event_role
     else:
         event_roles = []
-        emoji = ''
+        if alumni_role not in user.roles:
+            emoji = role_emoji.get(community_role.id, '❔')
+        else:
+            emoji = role_emoji.get(alumni_role().id, '❔')
         main_role = community_role
     all_roles = [community_role, *event_roles]
     organizer_role = discord.utils.find(lambda m: m.id == po_roles.ORGANIZER_ROLE_ID, guild.roles)
-    alumni_role = discord.utils.find(lambda m: m.id == po_roles.ALUMNI_ROLE_ID, guild.roles)
     moderator_role = discord.utils.find(lambda m: m.id == po_roles.MODERATOR_ROLE_ID, guild.roles)
     first_po_role = discord.utils.find(lambda m: m.id == po_roles.FIRST_PO_ROLE_ID, guild.roles)
     info_roles_txt = args[12:]
