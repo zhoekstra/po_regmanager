@@ -40,6 +40,9 @@ async def register_user(guild: discord.Guild, registration_string: str):
     alumni_role = discord.utils.find(lambda m: m.id == po_roles.ALUMNI_ROLE_ID, guild.roles)
     moderator_role = discord.utils.find(lambda m: m.id == po_roles.MODERATOR_ROLE_ID, guild.roles)
     first_po_role = discord.utils.find(lambda m: m.id == po_roles.FIRST_PO_ROLE_ID, guild.roles)
+    info_roles_txt = args[12:]
+    info_role_ids = [int(r) for r in info_roles_txt if(r != '')]
+    info_roles = [discord.utils.find(lambda m: m.id == r, guild.roles) for r in info_role_ids]
     if user is None:
         print("{}".format(registration_string))
         print("ERROR: user cannot be found".format())
@@ -60,6 +63,9 @@ async def register_user(guild: discord.Guild, registration_string: str):
         if alumni_role not in user.roles and moderator_role not in user.roles:
             await user.add_roles(first_po_role, reason="RegistrationBot")
         print("INFO: User {} successfully registered as a {}".format(user.nick, role.name))
+        
+        if len(info_roles) > 0:
+            await user.add_roles(*info_roles, reason="RegistrationBot")
         # Also post some info to member-ids
         memberidpoststr = "{},{},{}".format(discord_username, discord_discriminator, user.id)
         memberidschannel: discord.TextChannel = discord.utils.get(guild.text_channels, name="member-ids")
