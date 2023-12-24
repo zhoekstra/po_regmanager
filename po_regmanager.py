@@ -48,7 +48,7 @@ async def register_user(guild: discord.Guild, registration_string: str):
         if alumni_role not in user.roles:
             emoji = role_emoji.get(community_role.id, '❔')
         else:
-            emoji = role_emoji.get(alumni_role().id, '❔')
+            emoji = role_emoji.get(alumni_role.id, '❔')
         main_role = community_role
     all_roles = [community_role, *event_roles]
     organizer_role = discord.utils.find(lambda m: m.id == po_roles.ORGANIZER_ROLE_ID, guild.roles)
