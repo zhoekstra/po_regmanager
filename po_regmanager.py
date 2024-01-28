@@ -72,10 +72,9 @@ async def register_user(guild: discord.Guild, registration_string: str):
         print("INFO: User {} is an organizer - ignoring".format(user.nick))
         return user
     else:
-        await user.add_roles(*all_roles, reason="RegistrationBot")
-        
         user_nickname = "{0}{1} ({2}) #{3}".format(emoji, name, pronoun, badgenumber)
         await user.edit(nick=user_nickname)
+        await user.add_roles(*all_roles, reason="RegistrationBot")
         if alumni_role not in user.roles and moderator_role not in user.roles:
             await user.add_roles(first_po_role, reason="RegistrationBot")
         print("INFO: User {} successfully registered as a {}".format(user.nick, main_role.name))
